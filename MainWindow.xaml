@@ -1,12 +1,22 @@
 ﻿<Window x:Class="SavePDFApp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SavePDFApp"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        xmlns:local="clr-namespace:SavePDFApp.ViewModels"
+        Title="Saving PDF Application" Height="300" Width="400">
+    
+    <StackPanel Margin="20">
+        <TextBox Text="{Binding TextBoxContent, UpdateSourceTrigger=PropertyChanged}" 
+                 Width="200" Height="30" />
+        <Label Content="{Binding LabelContent}" Width="200" Height="30" Margin="0,10,0,10"/>
+        <Button Content="Печать" Width="200" Height="30" Command="{Binding PrintCommand}"/>
 
-    </Grid>
+        <DataGrid ItemsSource="{Binding Persons}" AutoGenerateColumns="False" HeadersVisibility="Column" Margin="0,10,0,0">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Номер" Binding="{Binding Number}" Width="*"/>
+                <DataGridTextColumn Header="Фамилия" Binding="{Binding LastName}" Width="*"/>
+                <DataGridTextColumn Header="Имя" Binding="{Binding FirstName}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </StackPanel>
 </Window>
+
