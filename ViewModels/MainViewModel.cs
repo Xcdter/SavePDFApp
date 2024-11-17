@@ -3,9 +3,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using PdfSharp.Pdf;
 using PdfSharp.Drawing;
-using System.IO;
 using SavePDFApp.Models;
-using System.Windows.Media;
 using System.Windows.Input;
 using SavePDFApp.Commands;
 
@@ -15,6 +13,7 @@ namespace SavePDFApp.ViewModels
     {
         private string _textBoxContent;
         private string _labelContent;
+        private ObservableCollection<Person> _persons;
 
         public string TextBoxContent
         {
@@ -22,7 +21,7 @@ namespace SavePDFApp.ViewModels
             set
             {
                 _textBoxContent = value;
-                LabelContent = value; // Update label content
+                LabelContent = value;
                 OnPropertyChanged();
             }
         }
@@ -37,7 +36,18 @@ namespace SavePDFApp.ViewModels
             }
         }
 
-        public ObservableCollection<Person> Persons { get; }
+        public ObservableCollection<Person> Persons
+        {
+            get
+            {
+                return _persons;
+            }
+            set
+            {
+                _persons = value;
+                OnPropertyChanged();
+            }
+        }
 
         public ICommand PrintCommand { get; }
 
@@ -51,7 +61,28 @@ namespace SavePDFApp.ViewModels
                 new Person { Number = 3, LastName = "Петров", FirstName = "Петр" }
             };
 
-            PrintCommand = new RelayCommand(PrintToPdf);
+            TextBoxContent = string.Empty;
+
+            _persons.CollectionChanged += PersonsCollectionChanged;
+
+            PrintCommand = new RelayCommand(PrintToPdf);            
+        }
+
+        private void PersonsCollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems != null)
+            {
+                var counter = e.NewStartingIndex;
+
+                foreach(var newItem in e.NewItems)
+                {
+                    var newPerson = (Person)newItem;
+
+                    if (newPerson.Number == 0) newPerson.Number = ++counter;
+                    if (newPerson.FirstName == null) newPerson.FirstName = string.Empty;
+                    if (newPerson.LastName == null) newPerson.LastName = string.Empty;
+                }
+            }
         }
 
         public void PrintToPdf()
@@ -122,7 +153,7 @@ namespace SavePDFApp.ViewModels
                         gfx.DrawString(person.FirstName, contentFont, XBrushes.Black,
                             new XPoint(startX + 2 * cellWidth + 5, currentY + 15));
 
-                        currentY += cellHeight; // Move to the next row
+                        currentY += cellHeight;
                     }
 
                     // Save the PDF
@@ -132,6 +163,7 @@ namespace SavePDFApp.ViewModels
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
