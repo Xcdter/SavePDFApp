@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace SavePDFApp.Models
 {
-    internal class Person
+    public class Person
     {
+        public int Number { get; set; }
+        public string LastName { get; set; }
+        public string FirstName { get; set; }
     }
 }
